@@ -9,9 +9,12 @@ from transacciones.serializers import TransaccionSerializer
 
 class TransaccionesList(APIView):
 
-  permission_classes = [permissions.IsAuthenticated]
+  permission_classes = [
+    permissions.IsAuthenticated
+  ]
 
   def get(self, request, format=None):
+
     transacciones = Transaccion.objects.all()
     serializer = TransaccionSerializer(transacciones, many=True)
     return Response(serializer.data)
