@@ -7,6 +7,8 @@ from django.http import Http404
 from transacciones.models import Transaccion
 from transacciones.serializers import TransaccionSerializer
 
+from usuarios.serializers import UsuarioSerializer
+
 class TransaccionesList(APIView):
 
   permission_classes = [

@@ -15,3 +15,30 @@ class Usuario(AbstractUser):
 
   def __str__(self):
     return self.email
+
+  def get_all_permissions(self):
+
+    def asignado(permission, permission_list):
+
+      for item in permission_list:
+
+        if item.name == permission.name:
+
+          return True
+
+      return False
+
+    user_permissions = []
+    groups = self.groups.all()
+
+    for group in groups:
+
+      group_permissions = group.permissions.all()
+
+      for permission in group_permissions:
+
+        if not asignado(permission, user_permissions):
+
+          user_permissions.append(permission)
+
+    return user_permissions
