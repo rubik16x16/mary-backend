@@ -42,3 +42,8 @@ class Usuario(AbstractUser):
           user_permissions.append(permission)
 
     return user_permissions
+
+  @staticmethod
+  def get_random():
+
+    return Usuario.objects.order_by("?").first()
