@@ -10,9 +10,4 @@ class Transaccion(models.Model):
   class Meta:
     db_table = 'transacciones'
 
-  def save(self, *args, **kwargs):
-
-    self.user = Usuario.objects.get(pk=1)
-    super(Transaccion, self).save(*args, **kwargs)
-
-  user = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+  usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='transacciones')

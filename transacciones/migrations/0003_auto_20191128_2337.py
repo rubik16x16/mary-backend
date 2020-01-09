@@ -13,10 +13,10 @@ def cargarTransacciones(apps, schema_editor):
   for i in range(1, 10):
 
     usuario = Usuario.get_random()
-    usuario.transaccion_set.add(Transaccion.objects.create(
+    usuario.transacciones.create(
       descripcion = fake.text(max_nb_chars=20),
       monto = fake.pyfloat(right_digits=2, positive=True, min_value=10, max_value=1000)
-    ))
+    )
 
 def descargarTransacciones(apps, schema_editor):
 
@@ -25,7 +25,8 @@ def descargarTransacciones(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('transacciones', '0002_transaccion_user'),
+        ('transacciones', '0001_initial'),
+        ('usuarios', '0002_auto_20191124_2132')
     ]
 
     operations = [
