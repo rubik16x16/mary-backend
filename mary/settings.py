@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 
 import os
 from datetime import timedelta
+from decouple import config
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -21,18 +22,19 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'jn!_3e1kj*#=blm1k1lc1i(2p1c8-26lu#5x_8jilv1+1dt0)_'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.split(',')])
 
 # Application definition
 
 INSTALLED_APPS = [
     'usuarios.apps.UsuariosConfig',
     'transacciones.apps.TransaccionesConfig',
+    'user_accounts.apps.UserAccountsConfig',
     'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -80,10 +82,10 @@ WSGI_APPLICATION = 'mary.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'mary',
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': '127.0.0.1'
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST')
     }
 }
 
@@ -112,10 +114,7 @@ REST_FRAMEWORK = {
     ],
 }
 
-CORS_ORIGIN_WHITELIST = [
-    "http://localhost:4200",
-    "http://127.0.0.1:4200"
-]
+CORS_ORIGIN_WHITELIST = config('CORS_ORIGIN_WHITELIST', cast=lambda v: [s.strip() for s in v.split(',')])
 
 CORS_ALLOW_METHODS = [
     'DELETE',
@@ -127,18 +126,18 @@ CORS_ALLOW_METHODS = [
 ]
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-    'SLIDING_TOKEN_LIFETIME': timedelta(days=1),
-    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=config('ACCESS_TOKEN_LIFETIME',  cast=int)),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=config('REFRESH_TOKEN_LIFETIME', cast=int)),
+    'SLIDING_TOKEN_LIFETIME': timedelta(days=config('SLIDING_TOKEN_LIFETIME', cast=int)),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=config('SLIDING_TOKEN_REFRESH_LIFETIME', cast=int)),
 }
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = config('LANGUAGE_CODE')
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = config('TIME_ZONE')
 
 USE_I18N = True
 

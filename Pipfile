@@ -4,6 +4,7 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+pylint = "*"
 
 [packages]
 django = "*"
@@ -11,6 +12,8 @@ djangorestframework = "*"
 mysqlclient = "*"
 django-cors-headers = "*"
 faker = "*"
+djangorestframework-simplejwt = "*"
+python-decouple = "*"
 
 [requires]
 python_version = "3.7"
