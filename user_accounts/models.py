@@ -10,3 +10,8 @@ class UserAccount(models.Model):
     db_table = 'user_accounts'
 
   user = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='accounts')
+
+  @staticmethod
+  def get_random():
+
+    return Usuario.objects.order_by("?").first()

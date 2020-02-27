@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
 
   dependencies = [
     ('user_accounts', '0001_initial'),
-    ('usuarios', '0002_auto_20191124_2132')
+    ('usuarios', '0002_auto_20200225_2143')
   ]
 
   operations = [
