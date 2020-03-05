@@ -4,12 +4,12 @@ from usuarios.serializers import UsuarioSerializer as UserSerializer
 
 class  UserAccountSerializer(serializers.ModelSerializer):
 
-  user = serializers.StringRelatedField(allow_null=True)
+	# user = serializers.StringRelatedField(allow_null=True)
 
-  class Meta:
-    model = UserAccount
-    fields = ['id', 'name', 'amount', 'user']
+	class Meta:
+		model = UserAccount
+		fields = ['id', 'name', 'amount']
 
-  def create(self, validated_data):
+	def create(self, validated_data):
 
-    return validated_data['user'].accounts.create(**validated_data)
+		return validated_data['user'].accounts.create(**validated_data)
