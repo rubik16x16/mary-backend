@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.test import APIRequestFactory, force_authenticate
 
 from user_accounts.views import UserAccountsDetail, UserAccountsList
-from usuarios.models import Usuario as User
+from users.models import User
 
 class UserAccountTestCase(TestCase):
 
@@ -15,6 +15,7 @@ class UserAccountTestCase(TestCase):
 		self.factory = APIRequestFactory()
 		self.fake = Faker()
 		self.user = User.objects.create_user('test@g.com', 'secret')
+		self.xuser = User.objects.create_user('test2@g.com', 'secret')
 		for i in range(0, self.user_accounts_len):
 
 			self.user.accounts.create(
@@ -22,10 +23,7 @@ class UserAccountTestCase(TestCase):
 				amount=self.fake.pyfloat(right_digits=2, positive=True, min_value=300, max_value=1200)
 			)
 
-		xuser = User.objects.create_user('test2@g.com', 'secret')
-		for i in range(0, 3):
-
-			xuser.accounts.create(
+			self.xuser.accounts.create(
 				name=self.fake.text(max_nb_chars=20),
 				amount=self.fake.pyfloat(right_digits=2, positive=True, min_value=300, max_value=1200)
 			)
@@ -86,15 +84,11 @@ class UserAccountTestCase(TestCase):
 	def test_delete_user_account(self):
 
 		# Bad request
-		data = {
-			'name': 'test',
-			'amount': 500
-		}
 
 		xuser = User.objects.get(email='test2@g.com')
 		user_account = xuser.accounts.order_by('?').first()
 		view = UserAccountsDetail.as_view()
-		request = self.factory.delete('/user/accounts/%d' % user_account.id, data)
+		request = self.factory.delete('/user/accounts/%d' % user_account.id)
 		force_authenticate(request, user=self.user)
 		response = view(request, user_account.id)
 		self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -102,7 +96,7 @@ class UserAccountTestCase(TestCase):
 		# Good request
 
 		user_account = self.user.accounts.order_by('?').first()
-		request = self.factory.delete('/user/accounts/%d' % user_account.id, data)
+		request = self.factory.delete('/user/accounts/%d' % user_account.id)
 		force_authenticate(request, user=self.user)
 		response = view(request, user_account.id)
 		self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)

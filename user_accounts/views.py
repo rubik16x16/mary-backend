@@ -20,7 +20,7 @@ class UserAccountsList(APIView):
 		serializer = UserAccountSerializer(user_accounts, many=True)
 		return Response(serializer.data)
 
-	def post(self, request, formart=None):
+	def post(self, request, format=None):
 
 		serializer = UserAccountSerializer(data = request.data)
 		if serializer.is_valid():

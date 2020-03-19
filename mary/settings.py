@@ -32,9 +32,9 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.spl
 # Application definition
 
 INSTALLED_APPS = [
-    'usuarios.apps.UsuariosConfig',
-    'transacciones.apps.TransaccionesConfig',
+    'users.apps.UsersConfig',
     'user_accounts.apps.UserAccountsConfig',
+		'transactions.apps.TransactionsConfig',
     'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -145,7 +145,7 @@ USE_L10N = True
 
 USE_TZ = True
 
-AUTH_USER_MODEL = 'usuarios.usuario'
+AUTH_USER_MODEL = 'users.user'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
