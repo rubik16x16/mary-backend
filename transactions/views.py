@@ -1,4 +1,5 @@
 from django.http import Http404
+from django.core.exceptions import PermissionDenied
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -19,7 +20,7 @@ class TransactionsAccountList(APIView):
 		try:
 			return user.accounts.get(pk=pk)
 		except UserAccount.DoesNotExist:
-			raise Http404
+			raise PermissionDenied
 
 	def get(self, request, account_pk, format=None):
 
@@ -43,40 +44,34 @@ class TransactionsDetail(APIView):
 		permissions.IsAuthenticated
 	]
 
-	def get_account(self, user, pk):
+	def get_transaction(self, user, pk):
 
 		try:
-			return user.accounts.get(pk=pk)
-		except UserAccount.DoesNotExist:
-			raise Http404
-
-	def get_transaction(self, account, pk):
-
-		try:
+			transaction = Transaction.objects.get(pk=pk)
+			account = user.accounts.get(pk=transaction.account.id)
 			return account.transactions.get(pk=pk)
+		except UserAccount.DoesNotExist:
+			raise PermissionDenied
 		except Transaction.DoesNotExist:
 			raise Http404
 
-	def get(self, request, account_pk, pk, format=None):
+	def get(self, request, pk, format=None):
 
-		account = self.get_account(request.user, account_pk)
-		transaction = self.get_transaction(account, pk)
+		transaction = self.get_transaction(request.user, pk)
 		serializer = TransactionSerializer(transaction)
 		return Response(serializer.data)
 
-	def put(self, request, account_pk, pk, format=None):
+	def put(self, request, pk, format=None):
 
-		account = self.get_account(request.user, account_pk)
-		transaction = self.get_transaction(account, pk)
+		transaction = self.get_transaction(request.user, pk)
 		serializer = TransactionSerializer(transaction, data=request.data)
 		if serializer.is_valid():
-			serializer.save(account=account)
+			serializer.save()
 			return Response(serializer.data)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-	def delete(self, request, account_pk, pk, format=None):
+	def delete(self, request, pk, format=None):
 
-		account = self.get_account(request.user, account_pk)
-		transaction = self.get_transaction(account, pk)
+		transaction = self.get_transaction(request.user, pk)
 		transaction.delete()
 		return Response(status=status.HTTP_204_NO_CONTENT)

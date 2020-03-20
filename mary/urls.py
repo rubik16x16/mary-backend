@@ -7,5 +7,5 @@ urlpatterns = [
   path('api/token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
   path('api/token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
   path('user/accounts/', include('user_accounts.urls')),
-	path('user/accounts/<int:account_pk>/transactions', include('transactions.urls'))
+	path('user/', include('transactions.urls'))
 ]

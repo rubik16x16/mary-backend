@@ -10,3 +10,9 @@ class TransactionSerializer(serializers.ModelSerializer):
 	def create(self, validated_data):
 
 		return validated_data['account'].transactions.create(**validated_data)
+
+	def update(self, instance, validated_data):
+
+		instance.fill(**validated_data)
+		instance.save()
+		return instance

@@ -1,7 +1,8 @@
 from django.db import models
 from user_accounts.models import UserAccount
+from tools.mary_model import MaryModel
 
-class Transaction(models.Model):
+class Transaction(models.Model, MaryModel):
 
 	INCOME = 'IN'
 	EXPENSE = 'EX'
