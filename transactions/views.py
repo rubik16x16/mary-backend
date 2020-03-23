@@ -1,5 +1,6 @@
-from django.http import Http404
 from django.core.exceptions import PermissionDenied
+from django.core.paginator import Paginator
+from django.http import Http404
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -8,8 +9,11 @@ from user_accounts.models import UserAccount
 
 from .models import Transaction
 from .serializers import TransactionSerializer
+from user_accounts.models import UserAccount
 
-class TransactionsAccountList(APIView):
+class TransactionsList(APIView):
+
+	RECORDS_FOR_PAGE = 5
 
 	permission_classes = [
 		permissions.IsAuthenticated
@@ -25,9 +29,13 @@ class TransactionsAccountList(APIView):
 	def get(self, request, account_pk, format=None):
 
 		account = self.get_account(request.user, account_pk)
-		transactions = account.transactions.all()
-		serializer = TransactionSerializer(transactions, many=True)
-		return Response(serializer.data)
+		num_page = request.GET.get('page', 1)
+		paginator = Paginator(account.transactions.order_by('created_at'), self.RECORDS_FOR_PAGE)
+		serializer = TransactionSerializer(paginator.page(num_page), many=True)
+		return Response({
+			'items': serializer.data,
+			'num_pages': paginator.num_pages
+		})
 
 	def post(self, request, account_pk, format=None):
 
@@ -35,7 +43,11 @@ class TransactionsAccountList(APIView):
 		serializer = TransactionSerializer(data=request.data)
 		if serializer.is_valid():
 			serializer.save(account=account)
-			return Response(serializer.data, status=status.HTTP_201_CREATED)
+			paginator = Paginator(account.transactions.order_by('created_at'), self.RECORDS_FOR_PAGE)
+			return Response({
+				'item': serializer.data,
+				'num_pages': paginator.num_pages
+			}, status=status.HTTP_201_CREATED)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class TransactionsDetail(APIView):
@@ -43,6 +55,8 @@ class TransactionsDetail(APIView):
 	permission_classes = [
 		permissions.IsAuthenticated
 	]
+
+	RECORDS_FOR_PAGE = 5
 
 	def get_transaction(self, user, pk):
 
@@ -73,5 +87,8 @@ class TransactionsDetail(APIView):
 	def delete(self, request, pk, format=None):
 
 		transaction = self.get_transaction(request.user, pk)
+		paginator = Paginator(transaction.account.transactions.order_by('created_at'), self.RECORDS_FOR_PAGE)
 		transaction.delete()
-		return Response(status=status.HTTP_204_NO_CONTENT)
+		return Response({
+			'num_pages': paginator.num_pages
+		}, status=status.HTTP_204_NO_CONTENT)

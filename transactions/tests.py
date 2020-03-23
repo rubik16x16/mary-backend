@@ -1,5 +1,6 @@
 import random
 
+from django.core.paginator import Paginator
 from django.test import TestCase
 from django.urls import reverse
 from faker import Faker
@@ -12,6 +13,7 @@ from users.models import User
 
 from .models import Transaction
 from .serializers import TransactionSerializer
+from .views import TransactionsList, TransactionsDetail
 
 class TransactionsTestCase(TestCase):
 
@@ -26,9 +28,10 @@ class TransactionsTestCase(TestCase):
 
 	def test_list_transactions(self):
 
-		transactions_count = self.account.transactions.all().count()
-		response = self.client.get(reverse('transactions:list', args=(self.account.id,)), format='json')
-		self.assertEqual(len(response.data), transactions_count)
+		paginator = Paginator(self.account.transactions.order_by('created_at'), TransactionsList.RECORDS_FOR_PAGE)
+		url = reverse('transactions:list', args=(self.account.id,))
+		response = self.client.get(url, format='json')
+		self.assertEqual(len(response.data['items']), len(paginator.page(1)))
 
 	def test_create_transaction(self):
 

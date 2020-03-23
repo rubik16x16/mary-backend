@@ -19,6 +19,8 @@ class Migration(migrations.Migration):
 				('amount', models.FloatField(max_length=12)),
 				('type', models.CharField(choices=[('IN', 'Income'), ('EX', 'Expense')], default='IN', max_length=2)),
 				('account', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='transactions', to='user_accounts.UserAccount')),
+				('created_at', models.DateTimeField(auto_now_add=True)),
+				('updated_at', models.DateTimeField(auto_now=True))
 			],
 			options={
 				'db_table': 'transactions',

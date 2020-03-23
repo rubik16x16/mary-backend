@@ -18,5 +18,8 @@ class Transaction(models.Model, MaryModel):
 
 	account = models.ForeignKey(UserAccount, on_delete=models.CASCADE, related_name='transactions')
 
+	created_at = models.DateTimeField(auto_now_add=True)
+	updated_at = models.DateTimeField(auto_now=True)
+
 	class Meta:
 		db_table = 'transactions'
