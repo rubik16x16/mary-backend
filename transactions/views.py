@@ -1,5 +1,5 @@
 from django.core.exceptions import PermissionDenied
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, EmptyPage
 from django.http import Http404
 from rest_framework import permissions, status
 from rest_framework.response import Response
@@ -30,7 +30,7 @@ class TransactionsList(APIView):
 
 		account = self.get_account(request.user, account_pk)
 		num_page = request.GET.get('page', 1)
-		paginator = Paginator(account.transactions.order_by('created_at'), self.RECORDS_FOR_PAGE)
+		paginator = Paginator(account.transactions.order_by('-created_at'), self.RECORDS_FOR_PAGE)
 		serializer = TransactionSerializer(paginator.page(num_page), many=True)
 		return Response({
 			'items': serializer.data,
@@ -87,8 +87,15 @@ class TransactionsDetail(APIView):
 	def delete(self, request, pk, format=None):
 
 		transaction = self.get_transaction(request.user, pk)
-		paginator = Paginator(transaction.account.transactions.order_by('created_at'), self.RECORDS_FOR_PAGE)
 		transaction.delete()
+		num_page = request.GET.get('page', 1)
+		paginator = Paginator(transaction.account.transactions.order_by('-created_at'), self.RECORDS_FOR_PAGE)
+		try:
+			transactions = paginator.page(num_page)
+		except EmptyPage:
+			transactions = []
+		serialiazer = TransactionSerializer(transactions, many=True)
 		return Response({
-			'num_pages': paginator.num_pages
-		}, status=status.HTTP_204_NO_CONTENT)
+			'num_pages': paginator.num_pages,
+			'items': serialiazer.data
+		}, status=status.HTTP_200_OK)

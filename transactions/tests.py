@@ -73,7 +73,7 @@ class TransactionsTestCase(TestCase):
 		transaction = self.account.transactions.first()
 		response = self.client.delete(reverse('transactions:detail', args=(transaction.id,)))
 
-		self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+		self.assertEqual(response.status_code, status.HTTP_200_OK)
 		self.assertNotEqual(transaction.id, self.account.transactions.first().id)
 
 	def test_security(self):
