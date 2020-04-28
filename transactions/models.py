@@ -14,7 +14,7 @@ class Transaction(models.Model, MaryModel):
 
 	description = models.CharField(max_length=60)
 	amount = models.FloatField(max_length=12)
-	type = models.CharField(max_length=2, choices=TYPES_CHOICES, default=INCOME)
+	trans_type = models.CharField(max_length=2, choices=TYPES_CHOICES, default=INCOME)
 
 	account = models.ForeignKey(UserAccount, on_delete=models.CASCADE, related_name='transactions')
 

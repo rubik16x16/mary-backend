@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
 				('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
 				('description', models.CharField(max_length=60)),
 				('amount', models.FloatField(max_length=12)),
-				('type', models.CharField(choices=[('IN', 'Income'), ('EX', 'Expense')], default='IN', max_length=2)),
+				('trans_type', models.CharField(choices=[('IN', 'Income'), ('EX', 'Expense')], default='IN', max_length=2)),
 				('account', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='transactions', to='user_accounts.UserAccount')),
 				('created_at', models.DateTimeField(auto_now_add=True)),
 				('updated_at', models.DateTimeField(auto_now=True))

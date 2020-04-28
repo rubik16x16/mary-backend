@@ -3,9 +3,11 @@ from .models import Transaction
 
 class TransactionSerializer(serializers.ModelSerializer):
 
+	trans_type = serializers.ChoiceField(choices=Transaction.TYPES_CHOICES, required=True)
+
 	class Meta:
 		model = Transaction
-		fields = ['id', 'description', 'type', 'amount']
+		fields = ['id', 'description', 'trans_type', 'amount', 'created_at', 'updated_at']
 
 	def create(self, validated_data):
 

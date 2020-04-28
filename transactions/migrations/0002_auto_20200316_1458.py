@@ -23,7 +23,7 @@ def seed_transactions(apps, schema_editor):
 					account.transactions.create(
 						description=fake.text(max_nb_chars=40),
 						amount=fake.pyfloat(right_digits=2, positive=True, min_value=2, max_value=30),
-						type=Transaction.EXPENSE if fake.pybool() else Transaction.INCOME
+						trans_type=Transaction.EXPENSE if fake.pybool() else Transaction.INCOME
 					)
 
 def unseed_transactions(apps, schema_editor):

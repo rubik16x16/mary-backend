@@ -17,4 +17,4 @@ class UserAccount(models.Model):
 	@staticmethod
 	def get_random():
 
-		return User.objects.order_by("?").first()
+		return UserAccount.objects.order_by("?").first()

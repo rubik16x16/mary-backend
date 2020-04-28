@@ -9,7 +9,6 @@ from user_accounts.models import UserAccount
 
 from .models import Transaction
 from .serializers import TransactionSerializer
-from user_accounts.models import UserAccount
 
 class TransactionsList(APIView):
 
@@ -30,7 +29,7 @@ class TransactionsList(APIView):
 
 		account = self.get_account(request.user, account_pk)
 		num_page = request.GET.get('page', 1)
-		paginator = Paginator(account.transactions.order_by('-created_at'), self.RECORDS_FOR_PAGE)
+		paginator = Paginator(account.transactions.select_related('account').order_by('-created_at'), self.RECORDS_FOR_PAGE)
 		serializer = TransactionSerializer(paginator.page(num_page), many=True)
 		return Response({
 			'items': serializer.data,
