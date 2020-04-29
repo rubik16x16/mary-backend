@@ -9,7 +9,7 @@ def seed_transactions(apps, schema_editor):
 
 	fake = Faker()
 
-	if config('DEBUG', default=False, cast=bool):
+	if config('SEED', default=False, cast=bool):
 
 		print('Sedding transactions')
 		acocunts = UserAccount.objects.all()

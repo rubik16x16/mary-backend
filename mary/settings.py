@@ -35,6 +35,7 @@ INSTALLED_APPS = [
 	'users.apps.UsersConfig',
 	'user_accounts.apps.UserAccountsConfig',
 	'transactions.apps.TransactionsConfig',
+	'transaction_categories.apps.TransactionCategoriesConfig',
 	'corsheaders',
 	'django.contrib.admin',
 	'django.contrib.auth',

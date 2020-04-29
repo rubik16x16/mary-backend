@@ -1,4 +1,6 @@
+from django.db import transaction as DbTransaction
 from rest_framework import serializers
+
 from .models import Transaction
 
 class TransactionSerializer(serializers.ModelSerializer):
@@ -11,7 +13,19 @@ class TransactionSerializer(serializers.ModelSerializer):
 
 	def create(self, validated_data):
 
-		return validated_data['account'].transactions.create(**validated_data)
+		account = validated_data['account']
+
+		with DbTransaction.atomic():
+
+			if validated_data['trans_type'] == Transaction.INCOME:
+				account.amount += validated_data['amount']
+			else:
+				account.amount -= validated_data['amount']
+			account.save()
+
+			transaction = account.transactions.create(**validated_data)
+
+		return transaction
 
 	def update(self, instance, validated_data):
 

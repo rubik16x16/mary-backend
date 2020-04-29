@@ -10,7 +10,7 @@ def seed_users(apps, schema_editor):
 
 	fake = Faker()
 
-	if config('DEBUG', default=False, cast=bool):
+	if config('SEED', default=False, cast=bool):
 
 		print('Sedding users')
 		for i in range(1, 10):

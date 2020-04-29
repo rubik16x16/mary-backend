@@ -29,7 +29,7 @@ class TransactionsTestCase(TestCase):
 	def test_list_transactions(self):
 
 		paginator = Paginator(self.account.transactions.order_by('created_at'), TransactionsList.RECORDS_FOR_PAGE)
-		url = reverse('transactions:list', args=(self.account.id,))
+		url = reverse('user:transactions:list', args=(self.account.id,))
 		response = self.client.get(url, format='json')
 		self.assertEqual(len(response.data['items']), len(paginator.page(1)))
 
@@ -38,10 +38,10 @@ class TransactionsTestCase(TestCase):
 		data = {
 			'description': self.fake.text(max_nb_chars=20),
 			'amount': self.fake.pyfloat(right_digits=2, positive=True),
-			'type': random.choice(Transaction.TYPES_CHOICES)[0]
+			'trans_type': random.choice(Transaction.TYPES_CHOICES)[0]
 		}
 
-		response = self.client.post(reverse('transactions:list', args=(self.account.id,)), data)
+		response = self.client.post(reverse('user:transactions:list', args=(self.account.id,)), data)
 
 		self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 		self.assertEqual(Transaction.objects.last().description, data['description'])
@@ -50,7 +50,7 @@ class TransactionsTestCase(TestCase):
 
 		transaction = self.account.transactions.first()
 		serializer = TransactionSerializer(transaction)
-		response = self.client.get(reverse('transactions:detail', args=(transaction.id,)))
+		response = self.client.get(reverse('user:transactions:detail', args=(transaction.id,)))
 
 		self.assertEqual(response.data, serializer.data)
 
@@ -59,11 +59,11 @@ class TransactionsTestCase(TestCase):
 		data = {
 			'description': self.fake.text(max_nb_chars=20),
 			'amount': self.fake.pyfloat(right_digits=2, positive=True),
-			'type': random.choice(Transaction.TYPES_CHOICES)[0]
+			'trans_type': random.choice(Transaction.TYPES_CHOICES)[0]
 		}
 
 		transaction = self.account.transactions.first()
-		response = self.client.put(reverse('transactions:detail', args=(transaction.id,)), data)
+		response = self.client.put(reverse('user:transactions:detail', args=(transaction.id,)), data)
 
 		self.assertEqual(response.status_code, status.HTTP_200_OK)
 		self.assertEqual(Transaction.objects.get(pk=transaction.id).description, data['description'])
@@ -71,7 +71,7 @@ class TransactionsTestCase(TestCase):
 	def test_delete_transaction(self):
 
 		transaction = self.account.transactions.first()
-		response = self.client.delete(reverse('transactions:detail', args=(transaction.id,)))
+		response = self.client.delete(reverse('user:transactions:detail', args=(transaction.id,)))
 
 		self.assertEqual(response.status_code, status.HTTP_200_OK)
 		self.assertNotEqual(transaction.id, self.account.transactions.first().id)
@@ -80,30 +80,31 @@ class TransactionsTestCase(TestCase):
 
 		# Authorized
 		self.client.logout()
-		response = self.client.get(reverse('transactions:list', args=(self.account.id,)), format='json')
+		response = self.client.get(reverse('user:transactions:list', args=(self.account.id,)), format='json')
 		self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-		response = self.client.get(reverse('transactions:detail', args=(1,)), format='json')
+		response = self.client.get(reverse('user:transactions:detail', args=(1,)), format='json')
 		self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+		self.client.force_authenticate(self.xuser)
 
 		# list Own transactions
 		account = self.user.accounts.first()
-		self.client.force_authenticate(self.xuser)
-		response = self.client.get(reverse('transactions:list', args=(account.id,)), format='json')
+		response = self.client.get(reverse('user:transactions:list', args=(account.id,)), format='json')
 		self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 		# Create transaction on own account
-		response = self.client.post(reverse('transactions:list', args=(account.id,)), format='json')
+		response = self.client.post(reverse('user:transactions:list', args=(account.id,)), format='json')
 		self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 		# See own transactions
 		transaction = self.account.transactions.first()
-		response = self.client.get(reverse('transactions:detail', args=(transaction.id,)))
+		response = self.client.get(reverse('user:transactions:detail', args=(transaction.id,)))
 		self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 		# Update own transaction
-		response = self.client.put(reverse('transactions:detail', args=(transaction.id,)))
+		response = self.client.put(reverse('user:transactions:detail', args=(transaction.id,)))
 		self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 		#delete own transaction
-		response = self.client.delete(reverse('transactions:detail', args=(transaction.id,)))
+		response = self.client.delete(reverse('user:transactions:detail', args=(transaction.id,)))
 		self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

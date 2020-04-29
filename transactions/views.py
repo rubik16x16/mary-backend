@@ -29,8 +29,9 @@ class TransactionsList(APIView):
 
 		account = self.get_account(request.user, account_pk)
 		num_page = request.GET.get('page', 1)
-		paginator = Paginator(account.transactions.select_related('account').order_by('-created_at'), self.RECORDS_FOR_PAGE)
+		paginator = Paginator(account.transactions.order_by('-created_at'), self.RECORDS_FOR_PAGE)
 		serializer = TransactionSerializer(paginator.page(num_page), many=True)
+
 		return Response({
 			'items': serializer.data,
 			'num_pages': paginator.num_pages
@@ -40,13 +41,17 @@ class TransactionsList(APIView):
 
 		account = self.get_account(request.user, account_pk)
 		serializer = TransactionSerializer(data=request.data)
+
 		if serializer.is_valid():
+
 			serializer.save(account=account)
 			paginator = Paginator(account.transactions.order_by('created_at'), self.RECORDS_FOR_PAGE)
+
 			return Response({
 				'item': serializer.data,
 				'num_pages': paginator.num_pages
 			}, status=status.HTTP_201_CREATED)
+
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class TransactionsDetail(APIView):
