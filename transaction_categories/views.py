@@ -11,7 +11,7 @@ from django.core.exceptions import PermissionDenied
 
 class TransactionCategoriesList(APIView):
 
-	RECORDS_FOR_PAGE = 5
+	RECORDS_PER_PAGE = 5
 
 	permission_classes = [
 		permissions.IsAuthenticated
@@ -21,7 +21,7 @@ class TransactionCategoriesList(APIView):
 
 		user = request.user
 		num_page = request.GET.get('page', 1)
-		paginator = Paginator(user.transaction_categories.order_by('created_at'), self.RECORDS_FOR_PAGE)
+		paginator = Paginator(user.transaction_categories.order_by('created_at'), self.RECORDS_PER_PAGE)
 		serializer = TransactionCategorySerializer(paginator.page(num_page), many=True)
 
 		return Response({
@@ -37,7 +37,7 @@ class TransactionCategoriesList(APIView):
 		if serializer.is_valid():
 
 			serializer.save(user=user)
-			paginator = Paginator(user.transaction_categories.order_by('created_at'), self.RECORDS_FOR_PAGE)
+			paginator = Paginator(user.transaction_categories.order_by('created_at'), self.RECORDS_PER_PAGE)
 
 			return Response({
 				'item': serializer.data,
@@ -48,7 +48,7 @@ class TransactionCategoriesList(APIView):
 
 class TransactionCategoryDetail(APIView):
 
-	RECORDS_FOR_PAGE = 5
+	RECORDS_PER_PAGE = 5
 
 	permission_classes = [
 		permissions.IsAuthenticated
@@ -84,7 +84,7 @@ class TransactionCategoryDetail(APIView):
 		transaction_category = self.get_transaction_category(user, pk)
 		transaction_category.delete()
 		num_page = request.GET.get('page', 1)
-		paginator = Paginator(user.transaction_categories.order_by('created_at'), self.RECORDS_FOR_PAGE)
+		paginator = Paginator(user.transaction_categories.order_by('created_at'), self.RECORDS_PER_PAGE)
 		try:
 			transaction_categories = paginator.page(num_page)
 		except EmptyPage:

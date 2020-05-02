@@ -25,7 +25,7 @@ class TransactionCategoriesTestCase(TestCase):
 
 	def test_list_transaction_categories(self):
 
-		paginator = Paginator(self.user.transaction_categories.order_by('created_at'), TransactionCategoriesList.RECORDS_FOR_PAGE)
+		paginator = Paginator(self.user.transaction_categories.order_by('created_at'), TransactionCategoriesList.RECORDS_PER_PAGE)
 		url = reverse('user:transaction_categories:list')
 		response = self.client.get(url, format='json')
 		self.assertEqual(len(response.data['items']), len(paginator.page(1)))

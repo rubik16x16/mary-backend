@@ -7,7 +7,7 @@ class TransactionCategorySerializer(serializers.ModelSerializer):
 	class Meta:
 
 		model = TransactionCategory
-		fields = ['name', 'created_at', 'updated_at']
+		fields = ['id', 'name', 'created_at', 'updated_at']
 
 	def create(self, validated_data):
 
