@@ -1,10 +1,10 @@
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator, EmptyPage
 from django.http import Http404
+from django.db import transaction as DbTransaction
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
 from user_accounts.models import UserAccount
 
 from .models import Transaction
@@ -82,24 +82,54 @@ class TransactionsDetail(APIView):
 	def put(self, request, pk, format=None):
 
 		transaction = self.get_transaction(request.user, pk)
-		serializer = TransactionSerializer(transaction, data=request.data)
-		if serializer.is_valid():
-			serializer.save()
-			return Response(serializer.data)
-		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+		account = transaction.account
+		new_transaction_data = request.data
+
+		with DbTransaction.atomic():
+
+			serializer = TransactionSerializer(transaction, data=new_transaction_data)
+			if serializer.is_valid():
+
+				if transaction.trans_type == Transaction.INCOME:
+
+					account.amount -= transaction.amount
+					account.amount += new_transaction_data['amount']
+				else:
+
+					account.amount += transaction.amount
+					account.amount -= new_transaction_data['amount']
+
+				account.save()
+				serializer.save()
+				return Response(serializer.data)
+			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 	def delete(self, request, pk, format=None):
 
 		transaction = self.get_transaction(request.user, pk)
-		transaction.delete()
-		num_page = request.GET.get('page', 1)
-		paginator = Paginator(transaction.account.transactions.order_by('-created_at'), self.RECORDS_FOR_PAGE)
-		try:
-			transactions = paginator.page(num_page)
-		except EmptyPage:
-			transactions = []
-		serialiazer = TransactionSerializer(transactions, many=True)
-		return Response({
-			'num_pages': paginator.num_pages,
-			'items': serialiazer.data
-		}, status=status.HTTP_200_OK)
+		account = transaction.account
+
+		with DbTransaction.atomic():
+
+			if transaction.trans_type == Transaction.INCOME:
+
+				account.amount -= transaction.amount
+
+			else:
+
+				account.amount += transaction.amount
+
+			account.save()
+			transaction.delete()
+
+			num_page = request.GET.get('page', 1)
+			paginator = Paginator(transaction.account.transactions.order_by('-created_at'), self.RECORDS_FOR_PAGE)
+			try:
+				transactions = paginator.page(num_page)
+			except EmptyPage:
+				transactions = []
+			serialiazer = TransactionSerializer(transactions, many=True)
+			return Response({
+				'num_pages': paginator.num_pages,
+				'items': serialiazer.data
+			}, status=status.HTTP_200_OK)
