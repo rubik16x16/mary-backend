@@ -115,6 +115,8 @@ REST_FRAMEWORK = {
 	]
 }
 
+CORS_ORIGIN_ALLOW_ALL = config('CORS_ORIGIN_ALLOW_ALL', default=False, cast=bool)
+
 CORS_ORIGIN_WHITELIST = config('CORS_ORIGIN_WHITELIST', cast=lambda v: [s.strip() for s in v.split(',')])
 
 CORS_ALLOW_METHODS = [
@@ -125,6 +127,8 @@ CORS_ALLOW_METHODS = [
 	'POST',
 	'PUT',
 ]
+
+CORS_ALLOW_HEADERS = config('CORS_ALLOW_HEADERS', cast=lambda v: [s.strip() for s in v.split(',')])
 
 SIMPLE_JWT = {
 	'ACCESS_TOKEN_LIFETIME': timedelta(days=config('ACCESS_TOKEN_LIFETIME',  cast=int)),
